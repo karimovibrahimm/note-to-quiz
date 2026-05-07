@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import "./App.css";
 import { GoogleGenAI } from "@google/genai";
+import { Analytics } from "@vercel/analytics/next";
 
 const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
 
