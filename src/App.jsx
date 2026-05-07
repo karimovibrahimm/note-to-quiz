@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import "./App.css";
 import { GoogleGenAI } from "@google/genai";
-import { Analytics } from "@vercel/analytics/next";
+import { Analytics } from "@vercel/analytics/react";
 
 const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
 
@@ -133,7 +133,9 @@ ${notes.trim()}
   }, []);
 
   return (
-    <div className="app-shell">
+    <>
+      <Analytics />
+      <div className="app-shell">
       <header className="hero">
         <div>
           <p className="eyebrow">Note to Quiz</p>
@@ -203,7 +205,8 @@ ${notes.trim()}
           </div>
         </section>
       )}
-    </div>
+      </div>
+    </>
   );
 }
 
