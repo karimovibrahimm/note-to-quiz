@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import "./App.css";
 import { GoogleGenAI } from "@google/genai";
 
@@ -12,8 +12,11 @@ function App() {
   const [notes, setNotes] = useState("");
   const [quiz, setQuiz] = useState([]);
   const [revealedAnswers, setRevealedAnswers] = useState({});
+  const [showToast, setShowToast] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const resultsRef = useRef(null);
+  const toastTimeoutRef = useRef(null);
 
   const toggleReveal = (index) => {
     setRevealedAnswers((prev) => ({
@@ -96,12 +99,37 @@ ${notes.trim()}
 
       setQuiz(parsedQuiz.slice(0, 5));
       setRevealedAnswers({});
+      setShowToast(true);
+      if (toastTimeoutRef.current) {
+        clearTimeout(toastTimeoutRef.current);
+      }
+      toastTimeoutRef.current = window.setTimeout(() => {
+        setShowToast(false);
+        toastTimeoutRef.current = null;
+      }, 3500);
     } catch (err) {
       setError(err.message || "Something went wrong.");
     } finally {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (quiz.length > 0 && resultsRef.current) {
+      resultsRef.current.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    }
+  }, [quiz]);
+
+  useEffect(() => {
+    return () => {
+      if (toastTimeoutRef.current) {
+        clearTimeout(toastTimeoutRef.current);
+      }
+    };
+  }, []);
 
   return (
     <div className="app-shell">
@@ -111,6 +139,8 @@ ${notes.trim()}
           <h1>Paste your notes and generate a 5-question quiz.</h1>
         </div>
       </header>
+
+      {showToast && <div className="toast">Quiz created successfully!</div>}
 
       <section className="panel">
         <label htmlFor="notes" className="label">
@@ -135,7 +165,7 @@ ${notes.trim()}
       </section>
 
       {quiz.length > 0 && (
-        <section className="results">
+        <section className="results" ref={resultsRef}>
           <h2>Generated Quiz</h2>
 
           <div className="question-list">
